@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Menu Debug Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .resource-test {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .resource-test h2 {
+            margin-top: 0;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        img, model-viewer {
+            max-width: 200px;
+            height: auto;
+            border: 1px dashed #ccc;
+        }
+    </style>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+    <h1>AR Menu Resource Test</h1>
+    <p>This page tests if your resources are loading correctly. Check the console for more detailed information.</p>
+    
+    <div class="resource-test">
+        <h2>CSS File</h2>
+        <div id="css-test">Testing...</div>
+    </div>
+    
+    <div class="resource-test">
+        <h2>JavaScript File</h2>
+        <div id="js-test">Testing...</div>
+    </div>
+    
+    <div class="resource-test">
+        <h2>Sound File</h2>
+        <div id="sound-test">Testing...</div>
+        <audio id="test-sound" src="./sounds/yum.mp3" preload="auto"></audio>
+        <button onclick="document.getElementById('test-sound').play()">Play Sound</button>
+    </div>
+    
+    <div class="resource-test">
+        <h2>3D Models</h2>
+        <div id="model-test">Testing...</div>
+        <model-viewer id="burger-viewer" src="./models/burger.gltf" auto-rotate camera-controls></model-viewer>
+    </div>
+    
+    <script>
+        // Test CSS
+        fetch('./styles/main.css')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('css-test').innerHTML = 
+                        '<span class="status success">SUCCESS</span> - CSS file loaded correctly.';
+                    console.log('CSS file loaded successfully');
+                } else {
+                    document.getElementById('css-test').innerHTML = 
+                        '<span class="status error">ERROR</span> - Could not load CSS file.';
+                    console.error('CSS file not found or could not be loaded');
+                }
+            })
+            .catch(error => {
+                document.getElementById('css-test').innerHTML = 
+                    '<span class="status error">ERROR</span> - ' + error;
+                console.error('Error loading CSS:', error);
+            });
+            
+        // Test JavaScript
+        fetch('./scripts/ar-menu.js')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('js-test').innerHTML = 
+                        '<span class="status success">SUCCESS</span> - JavaScript file loaded correctly.';
+                    console.log('JavaScript file loaded successfully');
+                } else {
+                    document.getElementById('js-test').innerHTML = 
+                        '<span class="status error">ERROR</span> - Could not load JavaScript file.';
+                    console.error('JavaScript file not found or could not be loaded');
+                }
+            })
+            .catch(error => {
+                document.getElementById('js-test').innerHTML = 
+                    '<span class="status error">ERROR</span> - ' + error;
+                console.error('Error loading JavaScript:', error);
+            });
+            
+        // Test Sound
+        const sound = document.getElementById('test-sound');
+        sound.addEventListener('canplaythrough', () => {
+            document.getElementById('sound-test').innerHTML = 
+                '<span class="status success">SUCCESS</span> - Sound file loaded correctly.';
+            console.log('Sound file loaded successfully');
+        });
+        
+        sound.addEventListener('error', () => {
+            document.getElementById('sound-test').innerHTML = 
+                '<span class="status error">ERROR</span> - Could not load sound file.';
+            console.error('Sound file not found or could not be loaded');
+        });
+        
+        // Test 3D Model
+        const modelViewer = document.getElementById('burger-viewer');
+        modelViewer.addEventListener('load', () => {
+            document.getElementById('model-test').innerHTML = 
+                '<span class="status success">SUCCESS</span> - 3D model loaded correctly.';
+            console.log('3D model loaded successfully');
+        });
+        
+        modelViewer.addEventListener('error', () => {
+            document.getElementById('model-test').innerHTML = 
+                '<span class="status error">ERROR</span> - Could not load 3D model.';
+            console.error('3D model not found or could not be loaded');
+        });
+    </script>
+</body>
+</html>
