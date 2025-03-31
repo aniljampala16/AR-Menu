@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Restaurant Menu</title>
+    
+    <!-- A-Frame and required AR components -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <!-- For surface detection (WebXR) -->
+    <script src="https://unpkg.com/aframe-extras@3.3.0/dist/aframe-extras.min.js"></script>
+    
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Loading screen -->
+    <div id="loading">
+        <div>
+            <h2>AR Menu is loading...</h2>
+            <p>Point your camera at a flat surface</p>
+        </div>
+    </div>
+    
+    <!-- Instructions overlay -->
+    <div class="instructions">
+        <p>Tap on the screen to place the menu on your table</p>
+        <p>Use two fingers to resize or rotate the menu</p>
+    </div>
+    
+    <!-- Menu selection panel -->
+    <div class="menu-panel">
+        <div class="menu-item active" data-dish="burger">Cheese Burger</div>
+        <div class="menu-item" data-dish="pizza">Pepperoni Pizza</div>
+    </div>
+    
+    <!-- AR Scene -->
+    <a-scene webxr="requiredFeatures: hit-test,local-floor; 
+                    optionalFeatures: dom-overlay,unbounded;
+                    overlayElement: .instructions;"
+             renderer="logarithmicDepthBuffer: true; precision: medium;"
+             gesture-detector>
+        
+        <!-- Assets -->
+        <a-assets>
+            <!-- Sound effects -->
+            <audio id="yum-sound" src="sounds/yum.mp3" preload="auto"></audio>
+            
+            <!-- 3D Models -->
+            <a-asset-item id="burger-model" src="models/burger.gltf"></a-asset-item>
+            <a-asset-item id="pizza-model" src="models/pizza.gltf"></a-asset-item>
+            <a-asset-item id="chef-model" src="models/chef.gltf"></a-asset-item>
+            <a-asset-item id="pizza-character-model" src="models/pizza_character.gltf"></a-asset-item>
+        </a-assets>
+        
+        <!-- Camera -->
+        <a-entity camera position="0 1.6 0" look-controls wasd-controls></a-entity>
+        
+        <!-- Virtual menu container to be placed on surface -->
+        <a-entity id="menu-container" position="0 0 -1" visible="false" menu-container>
+            <!-- Models will be added here dynamically by the JS script -->
+        </a-entity>
+        
+        <!-- Reticle for surface detection -->
+        <a-entity id="reticle" gltf-model="https://cdn.aframe.io/examples/ar/models/reticle/reticle.gltf"
+                 visible="false" scale="0.8 0.8 0.8" ar-hit-test></a-entity>
+        
+        <!-- Environment lighting -->
+        <a-entity light="type: ambient; intensity: 1.0;"></a-entity>
+        <a-entity light="type: directional; intensity: 0.6; castShadow: true" position="1 1 1"></a-entity>
+    </a-scene>
+    
+    <!-- JavaScript -->
+    <script src="scripts/ar-menu.js"></script>
+</body>
+</html>
