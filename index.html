@@ -5,152 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Restaurant Menu</title>
     
-    <!-- A-Frame and AR.js libraries -->
+    <!-- A-Frame and required AR components -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <!-- For surface detection (WebXR) -->
+    <script src="https://unpkg.com/aframe-extras@3.3.0/dist/aframe-extras.min.js"></script>
+    
     <link rel="stylesheet" href="styles/main.css">
 </head>
-<body style="margin: 0; overflow: hidden;">
-    <!-- Loading message -->
+<body>
+    <!-- Loading screen -->
     <div id="loading">
         <div>
             <h2>AR Menu is loading...</h2>
-            <p>Point your camera at the menu marker</p>
+            <p>Point your camera at a flat surface</p>
         </div>
     </div>
     
-    <div class="centered">AR Restaurant Menu - Point your camera at the QR code marker</div>
+    <!-- Instructions overlay -->
+    <div class="instructions">
+        <p>Tap on the screen to place the menu on your table</p>
+        <p>Use two fingers to resize or rotate the menu</p>
+    </div>
     
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false"
-             renderer="logarithmicDepthBuffer: true; precision: medium;">
+    <!-- Menu selection panel -->
+    <div class="menu-panel">
+        <div class="menu-item active" data-dish="burger">Cheese Burger</div>
+        <div class="menu-item" data-dish="pizza">Pepperoni Pizza</div>
+    </div>
+    
+    <!-- AR Scene -->
+    <a-scene webxr="requiredFeatures: hit-test,local-floor; 
+                    optionalFeatures: dom-overlay,unbounded;
+                    overlayElement: .instructions;"
+             renderer="logarithmicDepthBuffer: true; precision: medium;"
+             gesture-detector>
         
-        <!-- Define assets to preload -->
+        <!-- Assets -->
         <a-assets>
             <!-- Sound effects -->
             <audio id="yum-sound" src="sounds/yum.mp3" preload="auto"></audio>
             
-            <!-- Models will be loaded directly in markers for simplicity -->
+            <!-- 3D Models -->
+            <a-asset-item id="burger-model" src="models/burger.gltf"></a-asset-item>
+            <a-asset-item id="pizza-model" src="models/pizza.gltf"></a-asset-item>
+            <a-asset-item id="chef-model" src="models/chef.gltf"></a-asset-item>
+            <a-asset-item id="pizza-character-model" src="models/pizza_character.gltf"></a-asset-item>
         </a-assets>
         
-        <!-- Burger - Using the "hiro" marker -->
-        <a-marker preset="hiro" id="burger-marker">
-            <!-- Adult feature: realistic burger model with subtle spin -->
-            <a-entity id="burger-model" 
-                      gltf-model="models/burger.gltf" 
-                      position="0 0.5 0" 
-                      scale="0.5 0.5 0.5"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"
-                      class="adult-feature clickable"
-                      data-info="Locally sourced beef!">
-            </a-entity>
-            
-            <!-- Kid feature: cartoon chef character with bouncing animation -->
-            <a-entity id="burger-character" 
-                      gltf-model="models/chef.gltf" 
-                      position="1 0 0" 
-                      scale="0.5 0.5 0.5"
-                      animation="property: position; from: 1 0 0; to: 1 0.5 0; dur: 1000; loop: true; dir: alternate"
-                      class="kid-feature clickable">
-            </a-entity>
-            
-            <!-- Adult feature: dish information -->
-            <a-entity id="burger-info" position="0 -0.2 0">
-                <a-text value="Cheese Burger" 
-                        color="white" 
-                        align="center" 
-                        width="3"
-                        position="0 0 0">
-                </a-text>
-                <a-text value="Beef patty, cheddar, sesame bun" 
-                        color="white" 
-                        align="center" 
-                        width="3"
-                        scale="0.5 0.5 0.5"
-                        position="0 -0.3 0">
-                </a-text>
-                <a-text id="burger-fun-fact"
-                        value=""
-                        color="yellow"
-                        align="center"
-                        width="3"
-                        scale="0.6 0.6 0.6"
-                        position="0 -0.5 0"
-                        visible="false">
-                </a-text>
-                <a-text id="burger-yum"
-                        value="Yum!"
-                        color="red"
-                        align="center"
-                        width="3"
-                        scale="0.8 0.8 0.8"
-                        position="1 0.8 0"
-                        visible="false">
-                </a-text>
-            </a-entity>
-        </a-marker>
+        <!-- Camera -->
+        <a-entity camera position="0 1.6 0" look-controls wasd-controls></a-entity>
         
-        <!-- Pizza - Using the "kanji" marker -->
-        <a-marker preset="kanji" id="pizza-marker">
-            <!-- Adult feature: realistic pizza model with subtle spin -->
-            <a-entity id="pizza-model" 
-                      gltf-model="models/pizza.gltf" 
-                      position="0 0.2 0" 
-                      scale="0.5 0.5 0.5"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 12000"
-                      class="adult-feature clickable"
-                      data-info="Made with Italian tomatoes!">
-            </a-entity>
-            
-            <!-- Kid feature: animated pizza character with eyes and arms -->
-            <a-entity id="pizza-character" 
-                      gltf-model="models/pizza_character.gltf" 
-                      position="1 0 0" 
-                      scale="0.5 0.5 0.5"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
-                      class="kid-feature clickable">
-            </a-entity>
-            
-            <!-- Adult feature: dish information -->
-            <a-entity id="pizza-info" position="0 -0.2 0">
-                <a-text value="Pepperoni Pizza" 
-                        color="white" 
-                        align="center" 
-                        width="3"
-                        position="0 0 0">
-                </a-text>
-                <a-text value="Tomato sauce, mozzarella, pepperoni" 
-                        color="white" 
-                        align="center" 
-                        width="3"
-                        scale="0.5 0.5 0.5"
-                        position="0 -0.3 0">
-                </a-text>
-                <a-text id="pizza-fun-fact"
-                        value=""
-                        color="yellow"
-                        align="center"
-                        width="3"
-                        scale="0.6 0.6 0.6"
-                        position="0 -0.5 0"
-                        visible="false">
-                </a-text>
-                <a-text id="pizza-yum"
-                        value="Yum!"
-                        color="red"
-                        align="center"
-                        width="3"
-                        scale="0.8 0.8 0.8"
-                        position="1 0.8 0"
-                        visible="false">
-                </a-text>
-            </a-entity>
-        </a-marker>
+        <!-- Virtual menu container to be placed on surface -->
+        <a-entity id="menu-container" position="0 0 -1" visible="false" menu-container>
+            <!-- Models will be added here dynamically by the JS script -->
+        </a-entity>
         
-        <!-- Camera entity -->
-        <a-entity camera></a-entity>
+        <!-- Reticle for surface detection -->
+        <a-entity id="reticle" gltf-model="https://cdn.aframe.io/examples/ar/models/reticle/reticle.gltf"
+                 visible="false" scale="0.8 0.8 0.8" ar-hit-test></a-entity>
+        
+        <!-- Environment lighting -->
+        <a-entity light="type: ambient; intensity: 1.0;"></a-entity>
+        <a-entity light="type: directional; intensity: 0.6; castShadow: true" position="1 1 1"></a-entity>
     </a-scene>
     
-    <!-- JavaScript to handle loading and interactions -->
+    <!-- JavaScript -->
     <script src="scripts/ar-menu.js"></script>
 </body>
 </html>
